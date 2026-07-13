@@ -129,141 +129,199 @@ Run multiple independent Hermes instances on the same phone — one for work, on
 
 ## Quick Setup — 30 Minutes
 
+Before you start: enable **Install from unknown apps** for your file browser (or F-Droid) so you can install APKs.
+
 ### Step 1: Install Termux
 
-1. Download **Termux** from [F-Droid](https://f-droid.org/en/packages/com.termux/) (NOT the Play Store version — it's outdated)
-2. Download **Termux:Boot** from F-Droid (for auto-start on boot)
-3. Open Termux and run:
+1. If you don't have F-Droid yet, install it from **https://f-droid.org** (tap the download button, install the APK)
+2. Open F-Droid, tap the search icon, search for **Termux**
+3. Tap **Termux** → **Install** (not the Play Store version — it's outdated and broken)
+4. Also search for and install **Termux:Boot** (needed for auto-start later)
+5. Open Termux and run these two commands:
 
 ```bash
 pkg update && pkg upgrade -y
 pkg install termux-services proot-distro git curl -y
 ```
 
-### Step 2: Install a Linux Distro (proot)
+Wait for both to finish — the second one installs the tools we need.
+
+### Step 2: Install Ubuntu (the Linux system)
+
+Run these two commands one at a time:
 
 ```bash
 proot-distro install ubuntu
 proot-distro login ubuntu
 ```
 
-Inside Ubuntu:
+You'll see the command prompt change — you're now inside Ubuntu. Update it:
 
 ```bash
 apt update && apt upgrade -y
 apt install python3 python3-pip git curl wget -y
 ```
 
+> **What is proot?** It lets you run Ubuntu apps without rooting your phone. Think of it as a "fake root" that gives Hermes a normal Linux environment to work in.
+
 ### Step 3: Install Hermes
+
+Now install Hermes itself:
 
 ```bash
 curl -fsSL https://hermes-agent.nousresearch.com/install.sh | bash
 ```
 
-Restart proot:
+This downloads and runs the installer. It installs `uv` (a Python tool), creates a virtual environment, and sets up the `hermes` command. Takes about a minute.
+
+Restart the Ubuntu session so the `hermes` command becomes available:
 
 ```bash
 exit
 proot-distro login ubuntu
 ```
 
-### Step 4: Configure an AI Provider
+You should now be able to type `hermes --version` and get a version number back. If you get "command not found", something went wrong — re-run the curl command.
 
-Hermes needs an AI model to function. You have free options and paid upgrades:
+### Step 4: Set Up the Free AI Model
 
-| Provider | What You Get | Cost |
-|----------|-------------|------|
-| **OpenCode Zen** | DeepSeek v4 Flash Free | ✅ Free (no API key) |
-| **OpenRouter** | 200+ models, free tier available | ✅ Free tier |
-| **Anthropic Claude** | Sonnet, Haiku, Opus | 💰 Paid API key |
-| **OpenAI (GPT-4o)** | GPT-4o, GPT-4, GPT-3.5 | 💰 Paid API key |
-| **MiniMax** | M3 text + image generation | 💰 Paid (cheap) |
-| **Google Gemini** | Gemini 2.0 Flash, Pro | 💰 Paid API key |
-| **DeepSeek** | DeepSeek V3, R1 | 💰 Paid API key |
-| **xAI Grok** | Grok 2/3 models | 💰 Paid API key |
+Hermes needs an AI brain to work. The easiest free option is **OpenCode Zen** — no API key, no credit card, nothing.
 
-**Free option — OpenCode Zen (no API key, no credit card):**
+Run this command:
 
 ```bash
 hermes auth add opencode
 ```
 
-This opens a browser link — log in with GitHub. Done. You're now running **DeepSeek v4 Flash Free**, exactly like this conversation you're reading now.
+This prints a long URL that starts with `https://github.com/login/oauth/authorize?`. 
 
-**Free option — OpenRouter (free tier):**
+**On your phone, do this:**
+1. Long-press the URL in Termux and copy it (or tap and drag to select)
+2. Open your phone browser and paste the URL
+3. Log into GitHub if asked (your normal GitHub account)
+4. GitHub shows an "Authorize" button — tap it
+5. You'll see a page saying "Redirecting to localhost..." — the page will fail to load, **that's normal**
+6. Copy the full URL from the browser's address bar (it starts with `http://localhost?code=...`)
+7. Go back to Termux, paste it and press Enter
 
-1. Go to https://openrouter.ai/keys and create a free account
-2. Generate an API key
-3. Run:
+You're now authenticated. The prompt will reappear. Type `hermes model` to confirm — it should show **DeepSeek v4 Flash Free** as active.
 
-```bash
-hermes config set model.provider openrouter
-hermes config set model.default openrouter/auto
-echo 'OPENROUTER_API_KEY=your_key_here' >> ~/.hermes/.env
-```
+> **If the OAuth URL thing doesn't work**, use OpenRouter instead — it's also free, just needs a quick account:
+> 1. Go to **https://openrouter.ai/keys** in your browser, sign up free, generate an API key
+> 2. In Termux run:
+> ```bash
+> hermes config set model.provider openrouter
+> hermes config set model.default openrouter/auto
+> echo 'OPENROUTER_API_KEY=paste_your_key_here' >> ~/.hermes/.env
+> ```
 
-**If you already have paid API keys** (Anthropic, OpenAI, etc.), set them the same way and run `hermes model` to pick.
+Either way, you now have a working AI agent in Termux. You can test it by just typing `hermes` and chatting right there. But the real magic is via Telegram — keep going.
 
 ### Step 5: Set Up Telegram Gateway
 
-Message your agent from anywhere via Telegram:
+This lets you message your agent from anywhere — even when Termux isn't open.
 
-1. Create a bot via [@BotFather](https://t.me/BotFather) on Telegram
-2. Copy the bot token
-3. Configure Hermes:
+First, create a Telegram bot:
+1. Open Telegram, search for **@BotFather**
+2. Send `/newbot`
+3. It asks for a name — send any name, e.g. `My Personal AI`
+4. It asks for a username — must end in `bot`, e.g. `mypersonal_ai_bot`
+5. BotFather replies with a **token** — a long string like `7234567890:AAHdqTcvCH1vGWJxfSeOfS...`
+6. Copy that token, you need it next
+
+Now connect it to Hermes:
 
 ```bash
 hermes gateway setup
 ```
 
-Select Telegram, paste your token, then:
+This starts an interactive setup. It will ask:
+- **Which platform?** — type `telegram` and Enter
+- **Bot token?** — paste the token BotFather gave you and Enter
+- **Other questions** — just press Enter for defaults
+
+When it's done, start the gateway:
 
 ```bash
 hermes gateway install
 hermes gateway start
 ```
 
-Now message your bot on Telegram and it replies through Hermes. Voice messages work too — all free.
+**Test it:** Open Telegram, find your bot, and send it a message like *"Hello, are you working?"* You should get a reply within a few seconds. If not, wait 10 seconds and try again (gateway takes a moment to connect).
 
 ### Step 6: Enable Voice Replies (Free)
 
-Send a voice message on Telegram and get a voice reply back — no API key needed:
+This lets you send voice messages and get voice replies back — all free, no API key needed:
 
 ```bash
 hermes config set tts.provider edge
 hermes config set stt.enabled true
 ```
 
-Pick a voice:
+Pick a voice for the replies:
 
 ```bash
-hermes config set tts.voice en-US-AriaNeural  # English
-hermes config set tts.voice af-ZA-WillemNeural  # Afrikaans
+hermes config set tts.voice en-US-AriaNeural    # English (US woman)
+hermes config set tts.voice af-ZA-WillemNeural  # Afrikaans (SA man)
 ```
 
-Now just send a voice message to your bot.
+Now send a voice message to your Telegram bot — it will reply in the same voice.
 
 ### Step 7: Keep It Alive
 
-Prevent Android from killing Termux when the screen is off:
+Prevent Android from killing Termux:
 
 ```bash
 termux-wake-lock
 ```
 
-Auto-start on boot:
+This locks the wake lock so Termux stays running when the screen is off. You only need to run this once — it persists until the phone reboots.
+
+**Auto-start on boot** (so you don't have to manually start anything):
 
 ```bash
 mkdir -p ~/.termux/boot/
-cat > ~/.termux/boot/hermes-start << 'EOF'
+nano ~/.termux/boot/hermes-start
+```
+
+This opens a text editor. Type (or paste) these lines:
+
+```
 #!/data/data/com.termux/files/usr/bin/bash
 termux-wake-lock
 sv up hermes-gateway
-EOF
+```
+
+Press **Ctrl+X** then **Y** then **Enter** to save and exit.
+
+Make the script executable:
+
+```bash
 chmod +x ~/.termux/boot/hermes-start
 ```
 
-Install Termux:Boot from F-Droid and reboot — Hermes starts automatically.
+Make sure **Termux:Boot** is installed from F-Droid. Reboot your phone. After boot, open Termux:Boot at least once to grant it permission (it's just a one-time setup — after that it runs silently). From then on, Hermes starts automatically every time the phone boots.
+
+### Step 8: Test Everything Works
+
+1. Reboot your phone
+2. Wait 30 seconds
+3. Open Telegram and message your bot: *"Search the web for today's news"*
+4. You should get a reply with news summaries
+
+If you get a reply, everything is working — congratulations, you have a free AI server in your pocket.
+
+## Troubleshooting
+
+| Problem | Fix |
+|---------|-----|
+| "hermes command not found" | Run `exit` then `proot-distro login ubuntu` to restart the session |
+| Bot doesn't reply on Telegram | Run `hermes gateway status` to check if it's running. If not, `hermes gateway start` |
+| OAuth URL didn't work | Use OpenRouter instead — see Step 4 above |
+| Termux keeps stopping | You skipped battery optimization — see the section below |
+| Voice messages not working | Run `hermes config set tts.provider edge` and `/restart` in Telegram |
+| "Can't install from Play Store" | You're on the wrong version. Uninstall Termux, install F-Droid from f-droid.org, get Termux from there |
+| Something else stuck | Delete `~/.hermes/config.yaml` and run `hermes setup` to start fresh
 
 ## Disable Battery Optimization
 

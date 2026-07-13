@@ -6,29 +6,80 @@ No cloud GPU needed. No monthly fees. The phone becomes your own personal AI ser
 
 ## What This Setup Can Do
 
-### AI Chat & Image Gen
-Talk to it like any AI, send voice messages, generate images — all through Telegram or directly in Termux.
+### Always-On AI Assistant
+Chat with your phone like it's your own personal Jarvis. Text it on Telegram, send voice messages, get voice replies back. It never sleeps, never takes a day off.
+
+**Talk to it naturally:**
+- *"Search the web and summarize the latest AI news"*
+- *"Send an email to my boss about the project status"*
+- *"Remind me every Monday at 9am to check the Nixon devices"*
+- *"Scrape this URL and save the product prices"*
+- *"Generate an image of a cyberpunk city"*
+
+### Multi-Platform Reach
+One agent, everywhere you chat:
+- **Telegram** — text + voice messages both ways
+- **WhatsApp** — send/receive messages and media
+- **Discord** — full chat with thread support
+- **Signal** — encrypted messaging
+- **SMS** — good old text messages
+- **iMessage** — blue bubbles (no Mac relay needed)
+- **Email** — send/receive via Gmail, Outlook, etc.
 
 ### Web Search & Scraping
-Ask it to search the web, fetch articles, scrape websites, or research topics. Works with any public URL or search query.
+Search the web, fetch articles, scrape any public URL — works out of the box, no extra setup. Useful for research, monitoring competitors, tracking prices, or just getting quick answers on the go.
 
 ### Gmail & Email Automations
-Send emails, read your inbox, draft replies, automate email workflows. Can be set up with Gmail, Outlook, or any IMAP/SMTP provider.
+Send, read, draft, and forward emails through Hermes. Schedule email reports, auto-reply to certain senders, check your inbox on demand. Requires a free app password from Google.
+
+### Voice-to-Voice (Free)
+Send a voice message on Telegram → Hermes transcribes it → thinks → responds with a voice message. Uses Edge TTS (free, no API key). You can speak in English or Afrikaans and get a reply in the same voice.
+
+### Image Generation
+Generate images by just asking. Uses MiniMax, OpenAI DALL-E, or Stability AI — no GPU needed on the phone since the work happens in the cloud.
+
+### Parallel Subagent Workers
+This is a big one — Hermes can spawn **Claude Code, OpenAI Codex, or OpenCode CLI** as background workers while you keep chatting. You can ask it to:
+- *"Refactor my Python project while I keep asking questions"*
+- *"Research topic A and topic B in parallel"*
+- *"Write unit tests in the background and tell me when done"*
 
 ### Cron Jobs & Reminders
-Schedule recurring tasks — "remind me every day at 8am", "check a website every hour", "send a weekly report". Deliveries come straight to your Telegram.
+Schedule anything to run on repeat — every 30 minutes, daily at 8am, every Monday, or a one-shot date. All deliveries come to your Telegram:
+- *"Check disk space every hour and alert if low"*
+- *"Scrape news headlines daily at 7am"*
+- *"Remind me to call Hein every Friday at 3pm"*
+- *"Send a weekly usage report to my email"*
 
-### Coding & Git
-Clone repos, write and debug code (Python, bash, JS, etc.), push commits, run scripts. Full git integration.
+### Persistent Memory
+It remembers you across sessions — your name, your projects, your preferences, past conversations. Correct it once and it doesn't make the same mistake twice. No resetting context every time.
 
-### Subagent Delegation
-Spawn Claude Code, OpenAI Codex, or OpenCode CLI as subagents for parallel work — while you keep chatting.
+### Skills & Self-Improvement
+Every time you solve a complex problem together, Hermes can save that workflow as a **skill**. Over time it builds a library of procedures specific to your needs — it literally gets better the more you use it.
 
-### Skills & Memory
-Saves workflows as reusable skills. Remembers preferences and context across sessions. Gets better the more you use it.
+### Full Git & Coding
+Clone repos, write code, debug, push commits. Full Python, bash, and JS support through the terminal. You can even use it to write and update its own guide.
 
-### Always Online
-Runs as a service with auto-restart and wake-lock. Message it anytime — even when the screen is off.
+### MCP Servers (Plug Anything In)
+MCP (Model Context Protocol) lets you plug external tools and APIs directly into Hermes. Databases, business tools, home automation, custom APIs — if it has an API, you can connect it.
+
+### Webhooks
+Trigger Hermes from external events — GitHub push, cron job, IoT sensor, website form. Set it up once and it runs autonomously when events fire.
+
+### Filesystem Access & Checkpoints
+Read, write, search any file on the phone. Plus **checkpoint/rollback** — tell it to make a snapshot before a risky operation and roll back if something breaks.
+
+### Kanban Task Board
+Built-in multi-agent task board. Create tasks, assign them, track progress. Useful for managing projects alongside your AI.
+
+### Session Search
+Every conversation is saved and searchable. Ask *"What did we say about that PWA bug last week?"* and it finds the exact session instantly.
+
+### OpenAI-Compatible Proxy
+Expose Hermes as a local OpenAI API endpoint (`http://phone-ip:port`). Point any tool (Aider, Cline, Continue, etc.) at it and use your provider's models through the phone.
+
+### Multi-Profile Support
+Run multiple independent Hermes instances on the same phone — one for work, one for personal, one for experiments. Each has its own config, skills, memory, and sessions.
 
 ## Requirements
 
@@ -161,7 +212,25 @@ hermes gateway start
 
 Now message your bot on Telegram and it replies through Hermes. Voice messages work too.
 
-### Step 6: Keep It Alive
+### Step 6: Enable Voice Replies (Free)
+
+Send a voice message on Telegram and get a voice reply back — no API key needed:
+
+```bash
+hermes config set tts.provider edge
+hermes config set stt.enabled true
+```
+
+Edge TTS is free and works offline. You can change the voice:
+
+```bash
+hermes config set tts.voice en-US-AriaNeural  # English (US)
+hermes config set tts.voice af-ZA-WillemNeural  # Afrikaans
+```
+
+Now just send a voice message to your bot — Hermes transcribes it, thinks, and replies in voice.
+
+### Step 7: Keep It Alive
 
 Prevent Android from killing Termux when the screen is off:
 
@@ -306,6 +375,34 @@ hermes cron remove ID     # Delete a job
 - **Monitor storage** — logs and generated files can pile up over time
 - **Regular updates** — `hermes update` keeps the agent current
 - **Reset if stuck** — `/reset` in chat or `hermes` starts a fresh session
+
+## Real-World Examples
+
+Here are actual things you can do with this setup — not hypotheticals, tested on a Redmi A3x:
+
+**Business owner:**
+- *"Check my Gmail for unpaid invoices and list them"*
+- *"Send a bulk email to my customers about the new promotion"*
+- *"Scrape my competitor's website and tell me their prices"*
+- *"Remind me every morning to check yesterday's sales report"*
+
+**Developer:**
+- *"Clone my GitHub repo, fix the bug in app.py, and push the fix"*
+- *"Research library X vs library Y and recommend which to use"*
+- *"Write a Python script that monitors a website for changes"*
+- *"Spawn Codex to write unit tests while you help me debug this"*
+
+**Daily life:**
+- *"Search for flights to Cape Town next weekend"*
+- *"Summarize today's top tech news"*
+- *"Set a reminder to buy milk on my way home"*
+- *"Generate a logo for my side project"*
+- *"What's the weather like tomorrow?"*
+
+**Home automation:**
+- *"Send me a notification if my server goes down"*
+- *"Check the disk space every hour and alert me below 20%"*
+- *"Scrape this cryptocurrency price every 30 minutes"*
 
 ## What NOT to Do
 

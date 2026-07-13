@@ -1,0 +1,27 @@
+# Environment & secrets
+.env
+.env.*
+*.env
+auth.json
+credentials.json
+token*
+
+# Logs
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo

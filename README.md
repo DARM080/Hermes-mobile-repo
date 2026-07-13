@@ -10,7 +10,7 @@ Turn that old Android phone collecting dust in your drawer into a fully function
 |------------|-------------|--------------|
 | AI chat | DeepSeek v4 Flash Free (no key needed) | Claude, GPT-4o |
 | Voice replies | Edge TTS (no key needed) | — |
-| Image generation | Stability AI free tier | MiniMax, DALL-E |
+| Image generation | ❌ Needs API key (MiniMax, etc.) | MiniMax, DALL-E, Stability AI |
 | Web search & scraping | Built-in, free | — |
 | Telegram messaging | Free with @BotFather | — |
 | Cron jobs & reminders | Built-in, free | — |
@@ -48,8 +48,8 @@ Send, read, draft, and forward emails through Hermes. Schedule email reports, au
 ### Voice-to-Voice — ✅ Free
 Send a voice message on Telegram → Hermes transcribes it → thinks → responds with a voice message. Uses **Edge TTS** — free, no API key needed. You can speak in English or Afrikaans and get a reply in the same voice.
 
-### Image Generation — ✅ Free tier available
-Generate images by just asking. Use Stability AI free tier (free) or upgrade to MiniMax / DALL-E for higher quality (paid). No GPU needed on the phone since the work happens in the cloud.
+### Image Generation — 💰 Needs API key
+Generate images by just asking. Works with MiniMax, OpenAI DALL-E, or Stability AI — all need an API key. No GPU needed on the phone since the work happens in the cloud.
 
 ### Parallel Subagent Workers — ✅ Free
 Spawn **Claude Code, OpenAI Codex, or OpenCode CLI** as background workers while you keep chatting:

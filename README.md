@@ -1,21 +1,34 @@
 # Hermes Mobile — AI Agent on Your Old Android Phone
 
-Turn that old Android phone collecting dust in your drawer into a fully functional AI agent server. Runs **Hermes Agent** (by Nous Research) inside Termux + proot — same agent that powers coding assistants, research tools, and automation workflows, now running on repurposed mobile hardware.
+Turn that old Android phone collecting dust in your drawer into a fully functional AI agent server. Runs **Hermes Agent** (by Nous Research) inside Termux + proot — the same agent that powers coding assistants, research tools, and automation workflows, now running on repurposed mobile hardware.
 
-No cloud dependency required. No monthly fees. The phone becomes your own personal AI server.
+No cloud GPU needed. No monthly fees. The phone becomes your own personal AI server that you message from anywhere.
 
-## What You Get
+## What This Setup Can Do
 
-- **AI Chat** — text, voice-to-voice, image generation
-- **Internet Access** — web search and content extraction
-- **Telegram Gateway** — message it from anywhere via Telegram
-- **Cron Jobs** — scheduled reminders, web scrapers, automations
-- **Persistent Memory** — remembers you across sessions
-- **Git Integration** — clone, edit, and push code repos
-- **Coding Tools** — write and debug Python, bash, JS, and more
-- **Subagent Delegation** — spawn Claude Code, Codex, or OpenCode workers
-- **Skills System** — saves workflows and improves over time
-- **Always Online** — runsv service with wake-lock keeps it alive
+### AI Chat & Image Gen
+Talk to it like any AI, send voice messages, generate images — all through Telegram or directly in Termux.
+
+### Web Search & Scraping
+Ask it to search the web, fetch articles, scrape websites, or research topics. Works with any public URL or search query.
+
+### Gmail & Email Automations
+Send emails, read your inbox, draft replies, automate email workflows. Can be set up with Gmail, Outlook, or any IMAP/SMTP provider.
+
+### Cron Jobs & Reminders
+Schedule recurring tasks — "remind me every day at 8am", "check a website every hour", "send a weekly report". Deliveries come straight to your Telegram.
+
+### Coding & Git
+Clone repos, write and debug code (Python, bash, JS, etc.), push commits, run scripts. Full git integration.
+
+### Subagent Delegation
+Spawn Claude Code, OpenAI Codex, or OpenCode CLI as subagents for parallel work — while you keep chatting.
+
+### Skills & Memory
+Saves workflows as reusable skills. Remembers preferences and context across sessions. Gets better the more you use it.
+
+### Always Online
+Runs as a service with auto-restart and wake-lock. Message it anytime — even when the screen is off.
 
 ## Requirements
 
@@ -94,21 +107,38 @@ exit
 proot-distro login ubuntu
 ```
 
-### Step 4: Configure a Provider
+### Step 4: Configure an AI Provider
 
-Hermes needs an AI model provider to function. The easiest option is **OpenRouter** (free tier available):
+Hermes needs an AI model to function. It supports 20+ providers — here are the most common:
+
+| Provider | What You Get | Setup |
+|----------|-------------|-------|
+| **OpenRouter** | Access to 200+ models (free tier available) | Set `OPENROUTER_API_KEY` |
+| **OpenCode Zen** | DeepSeek v4 Flash Free, plus spawn OpenCode CLI | OAuth via `hermes auth add opencode` |
+| **Anthropic Claude** | Claude Sonnet, Haiku, Opus | Set `ANTHROPIC_API_KEY` |
+| **OpenAI (GPT-4o, etc.)** | GPT-4o, GPT-4, GPT-3.5 | Set `OPENAI_API_KEY` |
+| **MiniMax** | M3 text + image generation | Set `MINIMAX_API_KEY` |
+| **Google Gemini** | Gemini 2.0 Flash, Pro | Set `GOOGLE_API_KEY` |
+| **xAI Grok** | Grok 2/3 models | Set `XAI_API_KEY` |
+| **DeepSeek** | DeepSeek V3, R1 | Set `DEEPSEEK_API_KEY` |
+
+**Quick setup with OpenRouter (easiest, free tier):**
 
 1. Go to https://openrouter.ai/keys and create a free account
 2. Generate an API key
-3. Set it in your Hermes config:
+3. Run:
 
 ```bash
 hermes config set model.provider openrouter
-hermes config set model.default openrouter/auto  # auto-picks best model
+hermes config set model.default openrouter/auto
 echo 'OPENROUTER_API_KEY=your_key_here' >> ~/.hermes/.env
 ```
 
-**Alternative providers:** Anthropic, OpenAI, Google Gemini, MiniMax, DeepSeek, xAI/Grok, and 20+ more. Run `hermes model` to pick.
+**If you already have an OpenAI or Anthropic account,** just set the relevant key and run `hermes model` to pick your model.
+
+**What about ChatGPT?** If you have a ChatGPT Pro/Plus subscription, you can authenticate via OpenCode OAuth (`hermes auth add openai-codex`) which gives you access to OpenAI models through the Codex provider. If you have an OpenAI API key, set `OPENAI_API_KEY` directly.
+
+> No API key? Use OpenRouter — their free tier works immediately with rate-limited models.
 
 ### Step 5: Set Up Telegram Gateway (Optional)
 
@@ -167,9 +197,55 @@ This is the most common issue. Android will kill Termux to save battery unless y
 
 Also lock Termux in recent apps (long-press the app icon in the recents menu → Lock).
 
+## Web Search & Scraping
+
+Hermes can search the web and scrape any public URL. This works out of the box — no extra setup.
+
+**Ask naturally:**
+- *"Search for latest news on repurposed Android phones"*
+- *"Go to wikipedia.org and summarize the page on Raspberry Pi"*
+- *"Scrape this URL and tell me the prices: https://example.com/products"*
+
+Hermes fetches the page content, extracts the text, and responds with what you asked for. It can scrape articles, documentation, product listings, and more.
+
+**Technical notes:**
+- Works with any public URL (http/https)
+- Handles redirects, mobile/desktop user-agent
+- If a site blocks scraping, Hermes will tell you
+- Rate limit respect — not designed for bulk scraping
+
+## Gmail & Email Automations
+
+Send and receive emails right from your Hermes agent. You'll need an app password from your email provider.
+
+### Setup with Gmail
+
+1. Enable 2-Factor Authentication on your Google account
+2. Generate an app password: https://myaccount.google.com/apppasswords
+3. Set up in Hermes:
+
+```bash
+hermes config set email.enabled true
+hermes config set email.smtp_host smtp.gmail.com
+hermes config set email.smtp_port 587
+hermes config set email.smtp_user your.email@gmail.com
+hermes config set email.imap_host imap.gmail.com
+hermes config set email.imap_port 993
+echo 'EMAIL_PASSWORD=your_app_password_here' >> ~/.hermes/.env
+```
+
+### What you can do
+
+- *"Send an email to john@example.com with subject 'Meeting' and body 'See you at 3pm'"*
+- *"Check my inbox for any emails from my boss today"*
+- *"Draft a reply to the latest email about the project deadline"*
+- *"Forward the email about invoices to accounts@company.com"*
+
+Works with Gmail, Outlook, Yahoo, or any IMAP/SMTP provider. Restart Hermes after setting up email.
+
 ## Image Generation
 
-Hermes can generate images via hosted providers (no GPU needed on the phone):
+Hermes can generate images via hosted providers — no GPU needed on the phone:
 
 ```bash
 hermes config set image_gen.provider minimax
@@ -178,18 +254,49 @@ echo 'MINIMAX_API_KEY=your_key_here' >> ~/.hermes/.env
 
 Then just ask: *"Generate an image of a cow in a field"*
 
-Supported providers: MiniMax, OpenAI DALL-E, Stability AI, and more.
+Supported providers: MiniMax, OpenAI DALL-E, Stability AI, and others.
 
 ## Cron Jobs & Reminders
 
-Schedule recurring tasks:
+Schedule recurring tasks that run automatically and deliver results to your Telegram (or other connected platform).
+
+### Schedule Formats
+
+| Format | Example | Meaning |
+|--------|---------|---------|
+| Duration | `30m` | Every 30 minutes |
+| Duration | `2h` | Every 2 hours |
+| Natural | `every day at 8am` | Daily at 8am |
+| Natural | `every monday 9am` | Weekly on Monday |
+| Cron | `0 9 * * *` | Daily at 9am (standard cron) |
+| One-shot | `2026-12-25T09:00:00` | Run once on Christmas |
+
+### Create a Job
 
 ```bash
-hermes cron create --schedule "every day at 8am" --prompt "Give me a news briefing"
-hermes cron create --schedule "30m" --prompt "Check disk space and alert if low"
+hermes cron create --schedule "every day at 7am" --prompt "Give me a news briefing with today's top stories"
+hermes cron create --schedule "30m" --prompt "Check disk space and alert if below 10%"
+hermes cron create --schedule "every monday 9am" --prompt "Write a weekly summary of what I worked on"
 ```
 
-All deliveries come through your connected gateway (Telegram, etc.).
+### Reminders
+
+Just ask during a chat:
+- *"Remind me in 2 hours to call Hein"*
+- *"Set a reminder for tomorrow at 9am to check the Nixon devices"*
+- *"Remind me every Friday to submit my timesheet"*
+
+All reminders and cron deliveries come through your connected gateway (Telegram, etc.) so they reach your phone even when you're not in Termux.
+
+### Manage Jobs
+
+```bash
+hermes cron list          # View all jobs
+hermes cron pause ID      # Pause a job
+hermes cron resume ID     # Resume a paused job
+hermes cron run ID        # Trigger a job immediately
+hermes cron remove ID     # Delete a job
+```
 
 ## Tips & Tricks
 
